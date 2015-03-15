@@ -6,9 +6,9 @@ Composable modules intended for use with AWS Lambda functions
 AWS Lambda is pretty sweet, albeit still a bit quirky.
 
 I just spent a week building out my first Lambda function,
-and a handful of needs can be DRYed up and useful for many more Lambda functions. 
+and some tasks can be DRYed up. 
 
-Lambduh is just a grouping of those functions.
+(Lambduh)[https://github.com/lambduh] is a grouping of these composable modules.
 
 New Repos/Contributors/etc. are welcome - reach out with anything as an Issue.
 
@@ -18,12 +18,11 @@ Please Unit Test the crap out of your modules/PRs! These modules should be tiny 
 
 - [`lambduh-transform-s3-event`](https://github.com/lambduh/lambduh-transform-s3-event) - Transforms S3 Event JSON into a flattened object with attached bucket and key
 
-
 #Usage
 
-Lambduh modules are promise-based, and rely on passing an `options` object. Every module should receive an inputted object, manipulate it as necessary, then resolve it. 
+Lambduh modules are promise-based, and rely on passing an `options` object. Every module receives an inputted object, manipulates it as necessary, then resolves it. 
 
-In this way, modules should be constructed similarly to Koa middleware:
+In this way, modules should be constructed like middleware:
 
 ```javascript
 var Q = require('q');
