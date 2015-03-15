@@ -19,7 +19,8 @@ Please Unit Test the crap out of your modules/PRs! These modules should be tiny 
 #Modules
 
 - [`lambduh-transform-s3-event`](https://github.com/lambduh/lambduh-transform-s3-event) - Transforms S3 Event JSON into a flattened object with attached bucket and key
-- [`lambduh-validate`](https://github.com/lambduh/lambduh-validate-s3-key) - Validates fields according to your will
+- [`lambduh-validate`](https://github.com/lambduh/lambduh-validate) - Validates fields according to your will
+- [`lambduh-execute`](https://github.com/lambduh/lambduh-exectue) - Executes any shell string, with an option for showing the logs or not
 
 #Usage - `options` object flow
 
@@ -69,7 +70,11 @@ exports.handler = function(event, context) {
       endsWith: "\\.gif",
       endsWithout: "_\\d+\\.gif"
     }
-  })
+  }))
+  promises.push(execute({
+    shell: "cp /var/task/ffmpeg /tmp/.; chmod 755 /tmp/ffmpeg",
+    showOutput: true
+  }))
   
   promises.push(function(options) {
     //get from s3
