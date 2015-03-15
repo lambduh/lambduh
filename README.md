@@ -8,7 +8,7 @@ AWS Lambda is pretty sweet, albeit still a bit quirky.
 I just spent a week building out my first Lambda function,
 and some tasks can be DRYed up. 
 
-(Lambduh)[https://github.com/lambduh] is a grouping of these composable modules.
+[Lambduh](https://github.com/lambduh) is a grouping of these composable modules.
 
 New Repos/Contributors/etc. are welcome - reach out with anything as an Issue.
 
