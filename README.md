@@ -19,8 +19,9 @@ Please Unit Test the crap out of your modules/PRs! These modules should be tiny 
 #Modules
 
 - [`lambduh-transform-s3-event`](https://github.com/lambduh/lambduh-transform-s3-event) - Transforms S3 Event JSON into a flattened object with attached bucket and key
+- [`lambduh-validate`](https://github.com/lambduh/lambduh-validate-s3-key) - Validates fields according to your will
 
-#Usage
+#Usage - `options` object flow
 
 Lambduh modules are promise-based, and rely on passing an `options` object. Every module receives an inputted object, manipulates it as necessary, then resolves it. 
 
@@ -45,12 +46,15 @@ module.exports = function(settingsOrData) {
 }
 ```
 
-This allows you to compose Lambda functions with modules:
+#Composed lambda functions
+
+This structure allows you to compose Lambda functions with modules:
 
 ```javascript
 var Q = require('q');
 var lambduhModule = require('lambduh-module-name');
 var transformS3Event = require('lambduh-transform-s3-event');
+var validate = require('lambduh-validate');
 
 //your lambda function
 exports.handler = function(event, context) {
@@ -60,9 +64,17 @@ exports.handler = function(event, context) {
     data: somethingSpecific
   }))
   promises.push(transformS3Event(event)) //where `event` is an S3 event
+  promises.push(validate({
+    srcKey: {
+      endsWith: "\\.gif",
+      endsWithout: "_\\d+\\.gif"
+    }
+  })
   
   promises.push(function(options) {
-    console.log(options);
+    //get from s3
+    //manipulate
+    //put to s3
     context.done()
   })
   
