@@ -1,7 +1,7 @@
 # lambduh
 Composable modules intended for use with AWS Lambda functions
 
-#Intent
+#Philosophy
 
 AWS Lambda is pretty sweet, albeit still a bit quirky.
 
@@ -9,6 +9,8 @@ I just spent a week building out my first Lambda function,
 and some tasks can be DRYed up. 
 
 [Lambduh](https://github.com/lambduh) is a grouping of these composable modules.
+
+These modules are tiny! Seriously, you could just as easily write them yourself vs. learn whatever API they present. I just don't want to re-write them every time.
 
 New Repos/Contributors/etc. are welcome - reach out with anything as an Issue.
 
