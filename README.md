@@ -51,7 +51,7 @@ module.exports = function(settingsOrData) {
 
 #Composed lambda functions
 
-This structure allows you to compose Lambda functions with modules:
+This structure allows you to compose Lambda functions quickly and concisely:
 
 ```javascript
 var Q = require('q');
