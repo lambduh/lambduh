@@ -34,17 +34,17 @@ In this way, modules should be constructed like middleware:
 var Q = require('q');
 module.exports = function(settingsOrData) {
   return function(options) {
-    if (!options) { options = {} }
-    return Q.promise(function(resolve, reject, notify) {
-
-      options.do = "work"
-      
-      if (allIsDandy) {
-        resolve(options)
-      } else {
-        reject(new Error("Not all was dandy :-/"))
-      }
+    if (!options) options = {};
+    var def = Q.defer();
+    
+    //do work
+    if (allIsDandy) {
+      def.resolve(options);
+    } else {
+      def.reject(new Error("Not all was dandy :-/"));
     }
+    
+    return def.promise;
   }
 }
 ```
@@ -111,6 +111,6 @@ exports.handler = function(event, context) {
       console.log("derp");
       console.log(err);
       context.done(null, err);
-    });
+    })
 }
 ```
