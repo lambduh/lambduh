@@ -73,20 +73,20 @@ exports.handler = function(event, context) {
   
   promises.push(validate({
     srcKey: {
-      endsWith: "\\.gif",
-      endsWithout: "_\\d+\\.gif",
-      startsWith: "events/"
+      endsWith: "\\.gif", //only operate on `.gif`s
+      endsWithout: "_\\d+\\.gif", //exlude files with a `_300.gif` convention
+      startsWith: "events/" //only operate on the bucket's "events/" folder
     }
-  })) //only operate `.gif` files in the buckets "events" folder, excluding files ending with `_300.gif`
-  
-  promises.push(execute({
-    shell: "cp /var/task/ffmpeg /tmp/.; chmod 755 /tmp/ffmpeg"
   }))
   
-  promises.push(function(options) {
+  promises.push(function(options) { //download the file from s3 (based on the transformS3Event's passed options
     options.downloadFilepath = "/tmp/path/to/local/file.txt"
     return download()(options);
   })
+
+  promises.push(execute({ //execute some shell commands
+    shell: "cp /var/task/ffmpeg /tmp/.; chmod 755 /tmp/ffmpeg"
+  }))
   
   promises.push(function(options) {
     var def = Q.defer();
@@ -95,22 +95,22 @@ exports.handler = function(event, context) {
     return def.promise;
   })
 
-  promises.push(function(options) {
+  promises.push(function(options) { //upload the new file to a bucket/key on S3
     options.dstBucket = "destination-bucket"
     options.dstKey = "path/to/s3/upload/key.txt"
     options.uploadFilepath = "/tmp/path/to/local/manipulated/file.txt"
     return upload()(options);
   })
 
-  promises.push(function(options) {
+  promises.push(function(options) { //done() if no errors
     context.done()
   })
   
-  promises.reduce(Q.when, Q())
+  promises.reduce(Q.when, Q()) //resolve your promises in sequence
     .fail(function(err) {
       console.log("derp");
       console.log(err);
-      context.done(null, err);
+      context.done(null, err); //to be handled however you prefer
     })
 }
 ```
