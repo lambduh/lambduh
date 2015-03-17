@@ -72,7 +72,7 @@ exports.handler = function(event, context) {
   promises.push(transformS3Event(event)) //where `event` is an S3 event
   
   promises.push(validate({
-    srcKey: {
+    srcKey: { // requires options.srcKey to exist and meet the following criteria:
       endsWith: "\\.gif", //only operate on `.gif`s
       endsWithout: "_\\d+\\.gif", //exlude files with a `_300.gif` convention
       startsWith: "events/" //only operate on the bucket's "events/" folder
