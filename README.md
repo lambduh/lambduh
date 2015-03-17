@@ -79,7 +79,7 @@ exports.handler = function(event, context) {
     }
   }))
   
-  promises.push(function(options) { //download the file from s3 (based on the transformS3Event's passed options
+  promises.push(function(options) { //download the file from s3, based on the transformS3Event's passed options
     options.downloadFilepath = "/tmp/path/to/local/file.txt"
     return download()(options);
   })
