@@ -24,28 +24,24 @@ Please Unit Test the crap out of your modules/PRs! These modules should be tiny 
 - [`lambduh-get-s3-object`](https://github.com/lambduh/lambduh-get-s3-object) - Download any file from S3 to a local filepath
 - [`lambduh-put-s3-object`](https://github.com/lambduh/lambduh-put-s3-object) - Upload any local file to S3
 
-#Usage - `options` object flow
+#Usage - `result` object flow
 
-Lambduh modules are promise-based, and rely on passing an `options` object. Every module receives an inputted object, manipulates it as necessary, then resolves it. 
-
-In this way, modules should be constructed like middleware:
+Lambduh modules are promise-based, and rely on passing a `result` object. Every module receives this object as the first parameter, manipulates it as necessary, then resolves it. 
 
 ```javascript
 var Q = require('q');
-module.exports = function(settingsOrData) {
-  return function(options) {
-    if (!options) options = {};
-    var def = Q.defer();
+module.exports = function(result) {
+  if (!result) result = {};
+  var def = Q.defer();
     
-    //do work
-    if (allIsDandy) {
-      def.resolve(options);
-    } else {
-      def.reject(new Error("Not all was dandy :-/"));
-    }
-    
-    return def.promise;
+  //do work
+  if (allIsDandy) {
+    def.resolve(result);
+  } else {
+    def.reject(new Error("Not all was dandy :-/"));
   }
+    
+  return def.promise;
 }
 ```
 
@@ -63,54 +59,65 @@ var upload = require('lambduh-put-s3-object');
 
 //your lambda function
 exports.handler = function(event, context) {
-  var promises = [];
-  
-  promises.push(lambduhModule({
-    data: somethingSpecific
-  }))
-  
-  promises.push(transformS3Event(event)) //where `event` is an S3 event
-  
-  promises.push(validate({
-    srcKey: { // requires options.srcKey to exist and meet the following criteria:
-      endsWith: "\\.gif", //only operate on `.gif`s
-      endsWithout: "_\\d+\\.gif", //exlude files with a `_300.gif` convention
-      startsWith: "events/" //only operate on the bucket's "events/" folder
-    }
-  }))
-  
-  promises.push(function(options) { //download the file from s3, based on the transformS3Event's passed options
-    options.downloadFilepath = "/tmp/path/to/local/file.txt"
-    return download()(options);
-  })
 
-  promises.push(execute({ //execute some shell commands
-    shell: "cp /var/task/ffmpeg /tmp/.; chmod 755 /tmp/ffmpeg"
-  }))
+  lambduhModule({
+    data: somethingSpecific
+  })
   
-  promises.push(function(options) {
+  .then(function(result) {
+    return transformS3Event(result, event); //where `event` is an S3 event
+  })
+  
+  .then(function(result) {
+    return validate(result, {
+      srcKey: { // requires options.srcKey to exist and meet the following criteria:
+        endsWith: "\\.gif", //only operate on `.gif`s
+        endsWithout: "_\\d+\\.gif", //exlude files with a `_300.gif` convention
+        startsWith: "events/" //only operate on the bucket's "events/" folder
+      }
+    })
+  })
+  
+  .then(function(result) {
+    //download the file from s3
+    options = {
+      downloadFilepath: "/tmp/path/to/local/file.txt"
+    }
+    return download(result, options);
+  })
+  
+
+  .then(function(result) {
+    return execute(result, { //execute some shell commands
+      shell: "cp /var/task/ffmpeg /tmp/.; chmod 755 /tmp/ffmpeg"
+    })
+  })
+  
+  .then(function(result) {
     var def = Q.defer();
     //manipulate the file, say, with ffmpeg and/or imagemagick
-    def.resolve(options);
+    def.resolve(result);
     return def.promise;
   })
 
-  promises.push(function(options) { //upload the new file to a bucket/key on S3
-    options.dstBucket = "destination-bucket"
-    options.dstKey = "path/to/s3/upload/key.txt"
-    options.uploadFilepath = "/tmp/path/to/local/manipulated/file.txt"
-    return upload()(options);
+  .then(function(result) {
+    //upload the new file to a bucket/key on S3
+    options = {
+      dstBucket: "destination-bucket",
+      dstKey: "path/to/s3/upload/key.txt",
+      uploadFilepath: "/tmp/path/to/local/manipulated/file.txt"
+    }
+    return upload(result, options);
   })
 
-  promises.push(function(options) { //done() if no errors
+  .then(function(result) {
     context.done()
   })
   
-  promises.reduce(Q.when, Q()) //resolve your promises in sequence
-    .fail(function(err) {
-      console.log("derp");
-      console.log(err);
-      context.done(null, err); //to be handled however you prefer
-    })
+  .fail(function(err) {
+    console.log("derp");
+    console.log(err);
+    context.done(null, err); //to be handled however you prefer
+  })
 }
 ```
