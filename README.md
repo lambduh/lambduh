@@ -48,18 +48,18 @@ var download = require('lambduh-get-s3-object');
 var upload = require('lambduh-put-s3-object');
 
 //your lambda function
-exports.handler = function(event, context) {
+exports.handler = function(s3event, context) {
 
   lambduhModule({
     data: somethingSpecific
   })
   
-  .then(function(result) {
-    return transformS3Event(result, event); //where `event` is an S3 event
+  .then(function(event) {
+    return transformS3Event(event, s3event); //where `event` is an S3 event
   })
   
-  .then(function(result) {
-    return validate(result, {
+  .then(function(event) {
+    return validate(event, {
       srcKey: { // requires options.srcKey to exist and meet the following criteria:
         endsWith: "\\.gif", //only operate on `.gif`s
         endsWithout: "_\\d+\\.gif", //exlude files with a `_300.gif` convention
@@ -68,39 +68,34 @@ exports.handler = function(event, context) {
     })
   })
   
-  .then(function(result) {
+  .then(function(event) {
     //download the file from s3
     options = {
-      downloadFilepath: "/tmp/path/to/local/file.txt"
+      srcBucket: "source-bucket",
+      srcKey: "path/to/key.png",
+      downloadFilepath: "/tmp/file.png"
     }
-    return download(result, options);
+    return download(event, options);
   })
   
-
-  .then(function(result) {
-    return execute(result, { //execute some shell commands
-      shell: "cp /var/task/ffmpeg /tmp/.; chmod 755 /tmp/ffmpeg"
-    })
-  })
-  
-  .then(function(result) {
+  .then(function(event) {
     var def = Q.defer();
     //manipulate the file, say, with ffmpeg and/or imagemagick
-    def.resolve(result);
+    def.resolve(event);
     return def.promise;
   })
 
-  .then(function(result) {
+  .then(function(event) {
     //upload the new file to a bucket/key on S3
     options = {
       dstBucket: "destination-bucket",
       dstKey: "path/to/s3/upload/key.txt",
       uploadFilepath: "/tmp/path/to/local/manipulated/file.txt"
     }
-    return upload(result, options);
+    return upload(event, options);
   })
 
-  .then(function(result) {
+  .then(function(event) {
     context.done()
   })
   
