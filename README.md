@@ -1,7 +1,7 @@
 # lambduh
 Composable modules intended for use with AWS Lambda functions
 
-#Philosophy
+## Philosophy
 
 [Lambduh](https://github.com/lambduh) is a grouping of tasks that help me quickly compose Lambda functions.
 
@@ -9,7 +9,7 @@ These modules are tiny! Seriously, you could just as easily write them yourself 
 
 New Repos/Contributors/etc. are welcome - reach out with anything as an Issue.
 
-#Modules
+## Modules
 
 - [`lambduh-transform-s3-event`](https://github.com/lambduh/lambduh-transform-s3-event) - Transforms S3 Event JSON into a flattened object with bucket and key
 - [`lambduh-validate`](https://github.com/lambduh/lambduh-validate) - Validates fields according to your will
@@ -21,7 +21,7 @@ New Repos/Contributors/etc. are welcome - reach out with anything as an Issue.
 - [`lambduh-gulp`](https://github.com/lambduh/lambduh-gulp) - Gulp tasks to make your lambda workflow all hunky-dory
 
 
-#Example Lambda functions
+## Example Lambda functions
 
 - [`gif-to-mp4`](https://github.com/russmatney/lambda-gif-to-mp4) - Converts a .gif uploaded to S3 into an .mp4 and re-uploads to the same bucket. Uses ffmpeg as a binary.
 - [`create-timelapse`](https://github.com/russmatney/lambda-create-timelapse) - Orchestrates the creation of a timelapse based on an arbitrary number of .jpg or .gifs passed via URL, with music based on an mp3 url, then uploads to Vimeo. Utilizes the following 4 lambda functions:
@@ -31,13 +31,13 @@ New Repos/Contributors/etc. are welcome - reach out with anything as an Issue.
   - [`upload-to-vimeo`](https://github.com/russmatney/lambda-upload-to-vimeo) - Uploads a file in S3 to Vimeo, and sets some metadata
 
 
-#Usage
+## Usage
 
 Lambduh modules are promise-based. In general, any used fields should be explicitly passed in, and usually those fields are included on the returned object. The API is not yet uniform, but I've been productive with these pieces as they exist so far.
 
 I'm very much open to suggestions – at this point, I think keeping the modules isolated and flexible (rather than forcing them into a standard) will help them to be the most useful and easy to understand.
 
-##A composed lambda function
+### A composed lambda function
 
 ```javascript
 var Q = require('q');
